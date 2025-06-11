@@ -647,6 +647,13 @@
             const searchTerm = doctorSearchInput.value.trim().toLowerCase();
             let resultsHtml = '';
 
+            // Add Dr. Matt Miles
+            if (searchTerm.includes('matt') || searchTerm.includes('miles') || searchTerm.includes('internal medicine')) {
+                resultsHtml += '<p><strong>Dr. Matt Miles</strong> - Internal Medicine</p>';
+                resultsHtml += '<p>Location: 123 Any street, Any Town</p>';
+                resultsHtml += '<p>Availability: Mon, Tue, Thu</p><br>'; // Added generic availability
+            }
+
             if (searchTerm.includes('smith')) {
                 resultsHtml += '<p><strong>Dr. Emily Smith</strong> - General Practice</p>';
                 resultsHtml += '<p>Location: 123 Main St, Anytown</p>';
@@ -669,7 +676,7 @@
             }
 
             if (resultsHtml === '') {
-                resultsHtml = '<p>No doctors found matching your search. Try "Smith", "Jones", or "Pediatrics".</p>';
+                resultsHtml = '<p>No doctors found matching your search. Try "Smith", "Jones", "Pediatrics", "Matt Miles", or "Urgent".</p>';
                 selectDoctorAndContinueBtn.classList.add('hidden'); // Hide continue button if no results
             } else {
                 selectDoctorAndContinueBtn.classList.remove('hidden'); // Show continue button if results
