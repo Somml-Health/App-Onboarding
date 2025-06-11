@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Onboarding</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll on small screens */
+        }
+        .onboarding-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Increased border-radius for more rounded look */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 90%;
+            max-width: 28rem; /* Constrain max width for better readability on large screens */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+            position: relative; /* Needed for absolute positioning of back/page indicator */
+        }
+        .slide {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+            text-align: left; /* Adjust text alignment for content slides */
+        }
+        .slide.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-image {
+            width: 100%;
+            max-width: 250px; /* Adjust image size for better visual balance */
+            height: auto;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            object-fit: contain; /* Use contain to ensure the whole card is visible */
+            display: block; /* Ensure image is block level */
+            margin-left: auto;
+            margin-right: auto; /* Center image */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add shadow to the card image */
+        }
+        .slide-title {
+            font-size: 1.875rem; /* Tailwind text-3xl */
+            font-weight: 700; /* Tailwind font-bold */
+            color: #1a202c; /* Dark text color */
+            margin-bottom: 1rem;
+            text-align: center; /* Center title */
+        }
+        .slide-description {
+            font-size: 1rem; /* Tailwind text-base */
+            color: #4a5568; /* Gray text color */
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            text-align: left; /* Default text alignment for descriptions */
+        }
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem; /* Spacing between dots */
+            margin-top: 1rem; /* Adjust margin to be below content */
+            margin-bottom: 2rem;
+        }
+        .dot {
+            width: 0.625rem; /* Size of the dot */
+            height: 0.625rem;
+            background-color: #cbd5e0; /* Inactive dot color */
+            border-radius: 50%;
+            transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .dot.active {
+            background-color: #6366f1; /* Active dot color (indigo-500) */
+            transform: scale(1.2); /* Slightly larger for active dot */
+        }
+        .navigation-buttons {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically on small screens */
+            gap: 0.75rem; /* Space between stacked buttons */
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for buttons */
+            width: 100%; /* Full width for stacked buttons */
+        }
+        .btn:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+        }
+        .btn-primary {
+            background-color: #6366f1; /* Indigo-500 */
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #4f46e5; /* Indigo-600 */
+        }
+        .btn-secondary {
+            background-color: #e2e8f0; /* Gray-200 */
+            color: #2d3748; /* Gray-800 */
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e0; /* Gray-300 */
+        }
+        .btn-transparent {
+            background-color: transparent;
+            color: #6366f1; /* Indigo-500 */
+            box-shadow: none; /* No shadow for transparent button */
+        }
+        .btn-transparent:hover {
+            color: #4f46e5; /* Indigo-600 */
+        }
+
+        /* Top navigation (Back button and Page X of Y) */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: #4a5568;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            transition: color 0.2s ease-in-out;
+        }
+        .back-btn:hover {
+            color: #1a202c;
+        }
+        .page-indicator {
+            font-size: 0.875rem;
+            color: #4a5568;
+        }
+
+        /* Custom form elements for slide 1 */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: #4a5568;
+            appearance: none; /* Remove default select arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em 1.5em;
+        }
+        .toggle-switch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .toggle-label {
+            color: #2d3748;
+            font-weight: 500;
+        }
+        .toggle-btn {
+            position: relative;
+            display: inline-block;
+            width: 3.5rem;
+            height: 2rem;
+            cursor: pointer;
+        }
+        .toggle-btn input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 2rem;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 1.5rem;
+            width: 1.5rem;
+            left: 0.25rem;
+            bottom: 0.25rem;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #6366f1; /* Indigo-500 */
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #6366f1;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(1.5rem);
+            -ms-transform: translateX(1.5rem);
+            transform: translateX(1.5rem);
+        }
+        .turn-on-btn {
+            background-color: #e0e7ff; /* Indigo-100 */
+            color: #4f46e5; /* Indigo-600 */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .turn-on-btn:hover {
+            background-color: #c7d2fe; /* Indigo-200 */
+        }
+
+        /* Feature blocks for slide 3 */
+        .feature-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background-color: #f8fafc; /* Subtle background for blocks */
+        }
+        .feature-icon {
+            font-size: 2rem;
+            color: #6366f1; /* Indigo-500 */
+            margin-bottom: 0.75rem;
+        }
+        .feature-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        .feature-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+        .bullet-point-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .bullet-circle {
+            width: 1.25rem;
+            height: 1.25rem;
+            min-width: 1.25rem; /* Prevent shrinking */
+            min-height: 1.25rem; /* Prevent shrinking */
+            background-color: #e2e8f0; /* Placeholder color */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Prevent circle from shrinking */
+            margin-top: 0.25rem; /* Align with text */
+        }
+        .bullet-text {
+            text-align: left;
+        }
+        .bullet-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+        .bullet-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+
+        /* Styles for the new search input and results on Slide 2 */
+        .search-input-container {
+            display: flex;
+            gap: 0.5rem;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        .search-input {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+        .search-results {
+            width: 100%;
+            max-height: 150px; /* Limit height and make scrollable */
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: #f8fafc;
+            text-align: left;
+            color: #2d3748;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .search-results p {
+            margin-bottom: 0.5rem;
+        }
+        .search-results p:last-child {
+            margin-bottom: 0;
+        }
+
+
+        /* Media queries for responsiveness */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .onboarding-container {
+                padding: 3rem;
+            }
+            .slide-title {
+                font-size: 2.25rem; /* text-4xl */
+            }
+            .slide-description {
+                font-size: 1.125rem; /* text-lg */
+            }
+            .navigation-buttons {
+                flex-direction: row; /* Buttons side-by-side on larger screens */
+                justify-content: space-between;
+                gap: 1rem;
+            }
+            .btn {
+                width: auto; /* Auto width for side-by-side buttons */
+                flex-grow: 1; /* Allow buttons to grow and fill space */
+            }
+             .btn-secondary, .btn-transparent { /* Make these grow less to prioritize primary */
+                flex-grow: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <!-- Top Navigation (Back button and Page indicator) -->
+        <div class="top-nav">
+            <button id="globalBackBtn" class="back-btn hidden">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <span id="pageIndicator" class="page-indicator ml-auto">1 of 5</span>
+        </div>
+
+        <!-- Slide 1: Personalize Your Gia Experience -->
+        <div class="slide active" id="slide-1">
+            <h2 class="slide-title">Let's Personalize Your Gia Experience!</h2>
+            <!-- Placeholder for image, as it's a wireframe without a specific one here -->
+            <!-- Language Preference -->
+            <div class="form-group">
+                <label for="languageSelect" class="form-label"><i class="fas fa-globe"></i> Language Preference</label>
+                <p class="slide-description !mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <select id="languageSelect" class="form-select">
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                </select>
+            </div>
+
+            <!-- Communication Preferences -->
+            <div class="form-group">
+                <label class="form-label !mb-2"><i class="fas fa-comment"></i> Communication Preferences</label>
+                <p class="slide-description !mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+
+                <div class="toggle-switch">
+                    <span class="toggle-label">Email Preferences</span>
+                    <label class="toggle-btn">
+                        <input type="checkbox" id="emailToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-switch">
+                    <span class="toggle-label">Text Message</span>
+                    <label class="toggle-btn">
+                        <input type="checkbox" id="textMessageToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-switch">
+                    <span class="toggle-label">Push Notifications</span>
+                    <button class="turn-on-btn" id="pushNotificationsBtn">Turn On</button>
+                </div>
+            </div>
+            <!-- Action buttons for Slide 1 -->
+            <div class="navigation-buttons">
+                <button id="slide1SkipBtn" class="btn btn-secondary">Skip</button>
+                <button id="confirmPreferencesBtn" class="btn btn-primary">Confirm Preferences</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: Choose a Primary Care Provider - Updated with Search Functionality -->
+        <div class="slide" id="slide-2">
+            <h2 class="slide-title">Choose a Primary Care Provider</h2>
+            <p class="slide-description !text-center !mb-4">Search for your preferred doctor by name or specialty to find the right fit for your needs.</p>
+
+            <div class="search-input-container">
+                <input type="text" id="doctorSearchInput" class="search-input" placeholder="e.g., Dr. Smith or Pediatrics">
+                <button id="searchDoctorBtn" class="btn btn-primary">Search</button>
+            </div>
+
+            <div id="searchResults" class="search-results">
+                <!-- Search results will be displayed here -->
+                <p>No results yet. Please enter a search term and click 'Search'.</p>
+            </div>
+
+            <!-- Action buttons for Slide 2 -->
+            <div class="navigation-buttons">
+                <button id="slide2SkipBtn" class="btn btn-secondary">Skip</button>
+                <button id="selectDoctorAndContinueBtn" class="btn btn-primary hidden">Select Doctor & Continue</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Unlock the Power of You -->
+        <div class="slide" id="slide-3">
+            <h2 class="slide-title">Unlock the Power of You</h2>
+            <div class="feature-block">
+                <i class="fas fa-user-md feature-icon"></i> <!-- Doctor icon -->
+                <i class="fas fa-comment-dots feature-icon -mt-4 -ml-4"></i> <!-- Chat icon over doctor -->
+                <h3 class="feature-title">24/7 $0 Virtual Care</h3>
+                <p class="feature-description">For behavioral health care, urgent care, everyday care, nutrition and diet, and more.</p>
+            </div>
+            <div class="feature-block">
+                <i class="fas fa-heart feature-icon"></i>
+                <h3 class="feature-title">Free Preventive Care</h3>
+                <p class="feature-description">Preventive screenings, immunizations, counseling, pregnancy-related care, child well-visits, and more are all covered for free under your plan with in-network providers under the Affordable Care Act.</p>
+            </div>
+            <div class="feature-block">
+                <i class="fas fa-brain feature-icon"></i> <!-- Brain or mind icon -->
+                <h3 class="feature-title">$600 Well-Being Reimbursements</h3>
+                <p class="feature-description">We’ll reimburse you up to $600 in your plan year for purchases that benefit your well-being for things like gym memberships, yoga classes, fitness tracking devices, museum entrance fees, etc.,</p>
+            </div>
+            <!-- Action button for Slide 3 -->
+            <div class="navigation-buttons">
+                <button id="continueBtnSlide3" class="btn btn-primary">Continue</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: ID Card On The Go! -->
+        <div class="slide" id="slide-4">
+            <h2 class="slide-title">ID Card On The Go!</h2>
+            <!-- Updated image source to a placeholder for local testing, with fallback -->
+            <img src="https://placehold.co/400x250/A78BFA/ffffff?text=MVP+Card" alt="MVP Healthcare Member Card" class="slide-image" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Card+Image+Missing';">
+            <p class="slide-description !text-center">Access your MVP Healthcare Member Card anytime, anywhere. Easily download or view your digital ID card for quick reference.</p>
+            <!-- Action buttons for Slide 4 -->
+            <div class="navigation-buttons">
+                <button id="downloadIDCardBtn" class="btn btn-secondary">Download ID Card</button>
+                <button id="continueBtnSlide4" class="btn btn-primary">Continue</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: Get Ready to Make the Most of Gia! -->
+        <div class="slide" id="slide-5">
+            <h2 class="slide-title">Get Ready to Make the Most of Gia!</h2>
+            <div class="bullet-point-item">
+                <div class="bullet-circle"></div>
+                <div class="bullet-text">
+                    <h3 class="bullet-title">Find Care</h3>
+                    <p class="bullet-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.</p>
+                </div>
+            </div>
+            <div class="bullet-point-item">
+                <div class="bullet-circle"></div>
+                <div class="bullet-text">
+                    <h3 class="bullet-title">Manage Your Health</h3>
+                    <p class="bullet-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.</p>
+                </div>
+            </div>
+            <div class="bullet-point-item">
+                <div class="bullet-circle"></div>
+                <div class="bullet-text">
+                    <h3 class="bullet-title">Pharmacy and Drug Costs</h3>
+                    <p class="bullet-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+                </div>
+            </div>
+            <!-- Action button for Slide 5 -->
+            <div class="navigation-buttons">
+                <button id="takeMeToGiaBtn" class="btn btn-primary">Take Me to Gia!</button>
+            </div>
+        </div>
+
+        <!-- Progress Indicator Dots -->
+        <div class="progress-dots" id="progressDots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const globalBackBtn = document.getElementById('globalBackBtn');
+        const pageIndicator = document.getElementById('pageIndicator');
+
+        // Specific buttons for each slide
+        const slide1SkipBtn = document.getElementById('slide1SkipBtn');
+        const confirmPreferencesBtn = document.getElementById('confirmPreferencesBtn');
+        const slide2SkipBtn = document.getElementById('slide2SkipBtn');
+        const searchDoctorBtn = document.getElementById('searchDoctorBtn'); // Renamed
+        const selectDoctorAndContinueBtn = document.getElementById('selectDoctorAndContinueBtn'); // New button for after search
+        const continueBtnSlide3 = document.getElementById('continueBtnSlide3');
+        const downloadIDCardBtn = document.getElementById('downloadIDCardBtn');
+        const continueBtnSlide4 = document.getElementById('continueBtnSlide4');
+        const takeMeToGiaBtn = document.getElementById('takeMeToGiaBtn');
+
+        // Toggle elements for Slide 1
+        const emailToggle = document.getElementById('emailToggle');
+        const textMessageToggle = document.getElementById('textMessageToggle');
+        const pushNotificationsBtn = document.getElementById('pushNotificationsBtn');
+
+        // Elements for Slide 2 search
+        const doctorSearchInput = document.getElementById('doctorSearchInput');
+        const searchResultsDiv = document.getElementById('searchResults');
+
+
+        let currentSlide = 0; // Initialize the current slide index
+        const totalSlides = slides.length; // Total number of slides
+
+        /**
+         * Shows a specific slide and updates the progress dots and button visibility.
+         * @param {number} index - The index of the slide to show.
+         */
+        function showSlide(index) {
+            // Hide all slides and remove 'active' class from dots
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                dots[i].classList.remove('active');
+            });
+
+            // Show the current slide and add 'active' class to its corresponding dot
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+
+            // Update page indicator (e.g., "1 of 5")
+            pageIndicator.textContent = `${index + 1} of ${totalSlides}`;
+
+            // Update button visibility based on the current slide
+            updateGlobalButtonVisibility();
+        }
+
+        /**
+         * Updates the visibility of the global "Back" button.
+         */
+        function updateGlobalButtonVisibility() {
+            if (currentSlide === 0) {
+                globalBackBtn.classList.add('hidden');
+            } else {
+                globalBackBtn.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Navigates to the next slide.
+         */
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        /**
+         * Navigates to the previous slide.
+         */
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        /**
+         * Handles various skip actions across different slides.
+         * @param {string} source - Indicates which skip button was pressed (e.g., 'slide1', 'slide2').
+         */
+        function handleSkip(source) {
+            console.log(`Onboarding skipped from ${source} slide!`);
+            alert(`Onboarding skipped from ${source} slide! (This would lead to your main app)`);
+            // In a real app, you would typically redirect the user to the main application dashboard
+            // window.location.href = '/main-app-dashboard';
+        }
+
+        /**
+         * Handles the "Confirm Preferences" action on Slide 1.
+         */
+        function handleConfirmPreferences() {
+            console.log('Preferences confirmed!');
+            // You can add logic here to save preferences or send data
+            nextSlide(); // Move to the next slide
+        }
+
+        /**
+         * Simulates a doctor search and displays results on Slide 2.
+         */
+        function handleSearchDoctor() {
+            const searchTerm = doctorSearchInput.value.trim().toLowerCase();
+            let resultsHtml = '';
+
+            if (searchTerm.includes('smith')) {
+                resultsHtml += '<p><strong>Dr. Emily Smith</strong> - General Practice</p>';
+                resultsHtml += '<p>Location: 123 Main St, Anytown</p>';
+                resultsHtml += '<p>Availability: Mon, Wed, Fri</p><br>';
+            }
+            if (searchTerm.includes('jones')) {
+                resultsHtml += '<p><strong>Dr. Robert Jones</strong> - Pediatrics</p>';
+                resultsHtml += '<p>Location: 456 Oak Ave, Anytown</p>';
+                resultsHtml += '<p>Availability: Tue, Thu</p><br>';
+            }
+            if (searchTerm.includes('pediatrics')) {
+                resultsHtml += '<p><strong>Dr. Olivia White</strong> - Pediatrics</p>';
+                resultsHtml += '<p>Location: 789 Pine Ln, Anytown</p>';
+                resultsHtml += '<p>Availability: Mon - Fri</p><br>';
+            }
+            if (searchTerm.includes('urgent')) {
+                resultsHtml += '<p><strong>Urgent Care Clinic</strong> - Walk-ins welcome</p>';
+                resultsHtml += '<p>Location: 101 Elm St, Anytown</p>';
+                resultsHtml += '<p>Availability: Daily, 8 AM - 8 PM</p><br>';
+            }
+
+            if (resultsHtml === '') {
+                resultsHtml = '<p>No doctors found matching your search. Try "Smith", "Jones", or "Pediatrics".</p>';
+                selectDoctorAndContinueBtn.classList.add('hidden'); // Hide continue button if no results
+            } else {
+                selectDoctorAndContinueBtn.classList.remove('hidden'); // Show continue button if results
+            }
+
+            searchResultsDiv.innerHTML = resultsHtml;
+            alert('Search complete! Review results and click "Select Doctor & Continue".');
+        }
+
+        /**
+         * Handles selecting a doctor and continuing from Slide 2.
+         */
+        function handleSelectDoctorAndContinue() {
+            // In a real app, you'd handle the actual selection here
+            console.log('Doctor selected! Proceeding to next step.');
+            alert('Doctor selected! (Simulated action)');
+            nextSlide(); // Move to the next slide
+        }
+
+        /**
+         * Handles the "Continue" action on Slide 3.
+         */
+        function handleContinueSlide3() {
+            console.log('Continuing from Slide 3!');
+            nextSlide(); // Move to the next slide
+        }
+
+        /**
+         * Handles the "Download ID Card" action on Slide 4.
+         */
+        function handleDownloadIDCard() {
+            console.log('Downloading ID Card!');
+            alert('ID Card download initiated! (Simulated action)');
+            // In a real app, you would initiate a file download
+        }
+
+        /**
+         * Handles the "Continue" action on Slide 4.
+         */
+        function handleContinueSlide4() {
+            console.log('Continuing from Slide 4!');
+            nextSlide(); // Move to the next slide
+        }
+
+        /**
+         * Handles the "Take Me to Gia!" action on Slide 5.
+         */
+        function handleTakeMeToGia() {
+            console.log('Onboarding completed! Welcome to Gia!');
+            alert('Onboarding completed! Welcome to Gia!');
+            // In a real app, this would be the final redirection to the main app
+            // window.location.href = '/main-app-dashboard';
+        }
+
+        // Add event listeners
+        globalBackBtn.addEventListener('click', prevSlide);
+
+        // Slide 1 buttons
+        slide1SkipBtn.addEventListener('click', () => handleSkip('slide1'));
+        confirmPreferencesBtn.addEventListener('click', handleConfirmPreferences);
+        pushNotificationsBtn.addEventListener('click', () => {
+            alert('Push Notifications enabled! (Simulated action)');
+            // In a real app, you would enable push notifications
+        });
+
+        // Slide 2 buttons (updated)
+        slide2SkipBtn.addEventListener('click', () => handleSkip('slide2'));
+        searchDoctorBtn.addEventListener('click', handleSearchDoctor);
+        selectDoctorAndContinueBtn.addEventListener('click', handleSelectDoctorAndContinue);
+
+
+        // Slide 3 button
+        continueBtnSlide3.addEventListener('click', handleContinueSlide3);
+
+        // Slide 4 buttons
+        downloadIDCardBtn.addEventListener('click', handleDownloadIDCard);
+        continueBtnSlide4.addEventListener('click', handleContinueSlide4);
+
+        // Slide 5 button
+        takeMeToGiaBtn.addEventListener('click', handleTakeMeToGia);
+
+        // Initial display of the first slide and button visibility
+        showSlide(currentSlide);
+
+        // Basic custom alert function to replace window.alert
+        function alert(message) {
+            const alertBox = document.createElement('div');
+            alertBox.classList.add('fixed', 'inset-0', 'flex', 'items-center', 'justify-center', 'z-50', 'p-4', 'bg-black', 'bg-opacity-40'); /* Added overlay */
+            alertBox.innerHTML = `
+                <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center transform scale-100 transition-transform duration-300 ease-out">
+                    <p class="text-lg font-semibold text-gray-800 mb-4">${message}</p>
+                    <button id="closeAlertBtn" class="btn btn-primary w-full">OK</button>
+                </div>
+            `;
+            document.body.appendChild(alertBox);
+
+            // Add animation for alert box
+            setTimeout(() => {
+                const innerBox = alertBox.querySelector('div');
+                innerBox.style.transform = 'scale(1)';
+                innerBox.style.opacity = '1';
+            }, 10);
+
+            document.getElementById('closeAlertBtn').addEventListener('click', () => {
+                const innerBox = alertBox.querySelector('div');
+                innerBox.style.transform = 'scale(0.9)';
+                innerBox.style.opacity = '0';
+                alertBox.classList.remove('bg-opacity-40'); // Remove overlay opacity
+                setTimeout(() => {
+                    alertBox.remove();
+                }, 300);
+            });
+        }
+    </script>
+</body>
+</html>
